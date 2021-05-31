@@ -1,25 +1,34 @@
-import logo from './logo.svg';
-import './App.css';
+import produce from "immer";
+import create from "zustand";
+import * as THREE from "three";
+import { Canvas } from "@react-three/fiber";
+import { PerspectiveCamera, OrbitControls} from "@react-three/drei";
+import { Suspense, useRef } from "react";
 
-function App() {
+import Node from "./Node.js";
+
+const useWorld = create((set) => ({
+  world: {
+    width: 4,
+    height: 4,
+    depth: 4,
+    states: []
+  },
+  set: (fn) => set(produce(fn))
+}));
+
+const App = (props) => {
+  const { world, set } = useWorld((state) => state);
+  const camera = useRef();
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Suspense fallback={null}>
+      <Canvas>
+          <Node position={[0,0,0]} preyClass={"none"} />
+          <PerspectiveCamera ref={camera} />
+          <OrbitControls camera={camera.current} />
+      </Canvas>
+    </Suspense>
   );
-}
+};
 
 export default App;
