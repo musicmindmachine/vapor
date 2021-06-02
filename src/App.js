@@ -19,14 +19,15 @@ import {
 	Vignette,
 	DepthOfField,
 	ToneMapping,
+	TextureDataType,
 } from "@react-three/postprocessing";
 
 //Setup Central Data Storage
 const useWorld = create((set, get) => ({
 	world: {
-		width: 12,
-		height: 12,
-		depth: 12,
+		width: 18,
+		height: 18,
+		depth: 18,
 		animalDensity: 0.4,
 		preyRatio: 0.95,
 	},
@@ -308,7 +309,14 @@ const App = () => {
 
 	return (
 		<Suspense fallback={null}>
-			<Canvas mode={"concurrent"} camera={{ position: [0.0, 1, 0.0] }}>
+			<Canvas
+				colorManagement
+				gl={{
+					powerPreference: "high-performance",
+					alpha: true,
+				}}
+				mode={"concurrent"}
+				camera={{ position: [0.0, 1, 0.0] }}>
 				{/*<fog attach="fog" args={["#2255ee", depth * 2, depth * 5]} />*/}
 				<pointLight
 					intensity={25}
@@ -349,7 +357,13 @@ const App = () => {
 					autoRotate={true}
 				/>
 				<EffectComposer>
-					<SMAA preset={8} edgeDetectionMode={0} />
+					<ToneMapping
+						adaptive={false}
+						averageLuminance={0.0005}
+						middleGrey={0.1199}
+						maxLuminance={4.8}
+						opacity={0.5}
+					/>
 					<DepthOfField
 						blendFunction={THREE.AdditiveBlending}
 						focusDistance={0.2}
@@ -358,15 +372,9 @@ const App = () => {
 						height={480}
 					/>
 					<Bloom luminanceThreshold={0} luminanceSmoothing={0.9} height={300} />
-					<Noise opacity={0.02} />
 					<Vignette eskil={false} offset={0.1} darkness={1.1} />
-					<ToneMapping
-						adaptive={false}
-						averageLuminance={0.0005}
-						middleGrey={0.1199}
-						maxLuminance={4.8}
-						opacity={0.5}
-					/>
+					<Noise opacity={0.02} />
+					<SMAA preset={8} />
 				</EffectComposer>
 			</Canvas>
 		</Suspense>
