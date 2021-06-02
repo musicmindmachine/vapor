@@ -7,9 +7,8 @@ import {
 	PerspectiveCamera,
 	OrbitControls,
 	Line,
-	GizmoViewcube,
-	GizmoHelper,
-	OrthographicCamera,
+	Reflector,
+	useTexture,
 } from "@react-three/drei";
 import { Dodecahedron, useMatcapTexture, Tetrahedron } from "@react-three/drei";
 import {
@@ -19,8 +18,9 @@ import {
 	Noise,
 	Vignette,
 	DepthOfField,
+	ToneMapping,
 } from "@react-three/postprocessing";
-import { AdditiveBlending } from "three";
+import { TextureFilter } from "three";
 
 //Setup Central Data Storage
 const useWorld = create((set, get) => ({
@@ -294,7 +294,14 @@ const App = () => {
 	const { depth, height } = useWorld((state) => state.world);
 	const createWorld = useWorld((state) => state.createWorld);
 	const camera = useRef();
-	const orbitControls = useRef(null);
+	const texture = useTexture("./Soapstone02_2K_BaseColor.png");
+	const textureRough = useTexture("./Soapstone02_2K_Roughness.png");
+	texture.wrapS = THREE.RepeatWrapping;
+	texture.wrapT = THREE.RepeatWrapping;
+	texture.repeat.set(5, 5);
+	textureRough.wrapS = THREE.RepeatWrapping;
+	textureRough.wrapT = THREE.RepeatWrapping;
+	textureRough.repeat.set(5, 5);
 
 	useEffect(() => {
 		createWorld();
@@ -303,43 +310,64 @@ const App = () => {
 	return (
 		<Suspense fallback={null}>
 			<Canvas mode={"concurrent"} camera={{ position: [0.0, 1, 0.0] }}>
-				<fog attach="fog" args={["#2255ee", depth * 2, depth * 5]} />
+				{/*<fog attach="fog" args={["#2255ee", depth * 2, depth * 5]} />*/}
+				<pointLight
+					intensity={25}
+					color={"#88ffff"}
+					frustumCulled={false}
+					distance={50}
+					position={[0, 3 + height * 0.5, 0]}
+				/>
 				<Simulation position={{ x: 0.0, y: 3 + height * 0.5, z: 0.0 }} />
-				<GizmoHelper
-					margin={[50, 50]}
-					onTarget={() => orbitControls?.current?.target}
-					onUpdate={() => orbitControls?.current?.update()}
-					alignment="bottom-left" // widget alignment within scene
-				>
-					<GizmoViewcube />
-				</GizmoHelper>
-				<OrthographicCamera
+				<Reflector
+					position={[0.0, 0.0, 0.0]}
+					blur={[512, 512]} // Blur ground reflections (width, heigt), 0 skips blur
+					mixBlur={0.75} // How much blur mixes with surface roughness
+					mixStrength={0.25} // Strength of the reflections
+					resolution={1024} // Off-buffer resolution, lower=faster, higher=better quality
+					args={[100, 100]} // PlaneBufferGeometry arguments
+					rotation={[-Math.PI * 0.5, 0, 0]}
+					mirror={0.98} // Mirror environment, 0 = texture colors, 1 = pick up env colors
+					minDepthThreshold={0.25}
+					maxDepthThreshold={1}
+					depthScale={50}>
+					{(Material, props) => (
+						<Material metalness={0.5} roughness={0.9} {...props} />
+					)}
+				</Reflector>
+				<PerspectiveCamera
 					ref={camera}
 					position={[10, 1.5, 0]}
 					makeDefault
 					fov={70}
 				/>
 				<OrbitControls
-					ref={orbitControls}
 					camera={camera.current}
 					minDistance={depth * 0.05}
 					maxDistance={depth * 2.4 + 6}
-					enablePan={false}
-					minAzimuthAngle={0}
+					enablePan={true}
+					maxPolarAngle={Math.PI / 2}
 					autoRotate={true}
 				/>
 				<EffectComposer>
 					<SMAA preset={8} />
 					<DepthOfField
 						blendFunction={THREE.AdditiveBlending}
-						focusDistance={0.0}
-						focalLength={0.018}
+						focusDistance={0.2}
+						focalLength={0.5}
 						bokehScale={2}
 						height={480}
 					/>
 					<Bloom luminanceThreshold={0} luminanceSmoothing={0.9} height={300} />
 					<Noise opacity={0.02} />
 					<Vignette eskil={false} offset={0.1} darkness={1.1} />
+					<ToneMapping
+						adaptive={false}
+						averageLuminance={0.0005}
+						middleGrey={0.1199}
+						maxLuminance={4.8}
+						opacity={0.5}
+					/>
 				</EffectComposer>
 			</Canvas>
 		</Suspense>
