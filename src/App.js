@@ -20,14 +20,13 @@ import {
 	DepthOfField,
 	ToneMapping,
 } from "@react-three/postprocessing";
-import { TextureFilter } from "three";
 
 //Setup Central Data Storage
 const useWorld = create((set, get) => ({
 	world: {
-		width: 22,
-		height: 22,
-		depth: 22,
+		width: 12,
+		height: 12,
+		depth: 12,
 		animalDensity: 0.4,
 		preyRatio: 0.95,
 	},
@@ -350,7 +349,7 @@ const App = () => {
 					autoRotate={true}
 				/>
 				<EffectComposer>
-					<SMAA preset={8} />
+					<SMAA preset={8} edgeDetectionMode={0} />
 					<DepthOfField
 						blendFunction={THREE.AdditiveBlending}
 						focusDistance={0.2}
