@@ -21,7 +21,7 @@ const useWorld = create((set, get) => ({
 		width: 22,
 		height: 22,
 		depth: 22,
-		animalDensity: 0.15,
+		animalDensity: 0.4,
 		preyRatio: 0.95,
 	},
 	worldMap: [],
