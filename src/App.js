@@ -19,7 +19,6 @@ import {
 	Vignette,
 	DepthOfField,
 	ToneMapping,
-	TextureDataType,
 } from "@react-three/postprocessing";
 
 //Setup Central Data Storage
@@ -112,27 +111,14 @@ const LineGrid = (props) => {
 		let column,
 			row,
 			slice = 0;
-		const verticies = new Float32Array({});
 
 		//start looping through each orthogonal axis and make lines.
 		//this just calculates the vertexes of each line for now
-
 		//width-depth
 		for (column = -1; column <= 1; column += 0.5) {
 			for (row = -1; row <= 1; row += 0.5) {
 				newLines.push({
 					key: newLines.length,
-					vertexArray: new Float32Array([
-						lineDistLimit + position.x,
-						world.width * 0.5 * column + position.y,
-						world.depth * 0.5 * row + position.z,
-						0 + position.x,
-						world.width * 0.5 * column + position.y,
-						world.depth * 0.5 * row + position.z,
-						-lineDistLimit,
-						world.width * 0.5 * column + position.y,
-						world.depth * 0.5 * row + position.z,
-					]), //hack for now remove
 					start: [
 						lineDistLimit + position.x,
 						world.width * 0.5 * column + position.y,
@@ -157,17 +143,6 @@ const LineGrid = (props) => {
 			for (row = -1; row <= 1; row += 0.5) {
 				newLines.push({
 					key: newLines.length,
-					vertexArray: new Float32Array([
-						world.height * 0.5 * slice + position.x,
-						lineDistLimit + position.y,
-						world.depth * 0.5 * row + position.z,
-						world.height * 0.5 * slice + position.x,
-						0 + position.y,
-						world.depth * 0.5 * row + position.z,
-						world.height * 0.5 * slice + position.x,
-						-lineDistLimit + position.y,
-						world.depth * 0.5 * row + position.z,
-					]), //hack for now remove
 					start: [
 						world.height * 0.5 * slice + position.x,
 						lineDistLimit + position.y,
@@ -192,17 +167,6 @@ const LineGrid = (props) => {
 			for (column = -1; column <= 1; column += 0.5) {
 				newLines.push({
 					key: newLines.length,
-					vertexArray: new Float32Array([
-						world.height * 0.5 * slice + position.x,
-						world.width * 0.5 * column + position.y,
-						lineDistLimit + position.z,
-						world.height * 0.5 * slice + position.x,
-						world.width * 0.5 * column + position.y,
-						0 + position.z,
-						world.height * 0.5 * slice + position.x,
-						world.width * 0.5 * column + position.y,
-						-lineDistLimit + position.z,
-					]), //hack for now remove
 					start: [
 						world.height * 0.5 * slice + position.x,
 						world.width * 0.5 * column + position.y,
@@ -328,16 +292,16 @@ const App = () => {
 				<Simulation position={{ x: 0.0, y: 3 + height * 0.5, z: 0.0 }} />
 				<Reflector
 					position={[0.0, 0.0, 0.0]}
-					blur={[512, 512]} // Blur ground reflections (width, heigt), 0 skips blur
-					mixBlur={0.75} // How much blur mixes with surface roughness
-					mixStrength={0.25} // Strength of the reflections
-					resolution={1024} // Off-buffer resolution, lower=faster, higher=better quality
-					args={[100, 100]} // PlaneBufferGeometry arguments
+					blur={[0, 0]}
+					mixBlur={0}
+					mixStrength={0.25}
+					resolution={1024}
+					args={[100, 100]}
 					rotation={[-Math.PI * 0.5, 0, 0]}
-					mirror={0.98} // Mirror environment, 0 = texture colors, 1 = pick up env colors
-					minDepthThreshold={0.25}
-					maxDepthThreshold={1}
-					depthScale={50}>
+					mirror={0.995}
+					minDepthThreshold={0.0}
+					maxDepthThreshold={0.01}
+					depthScale={0.2}>
 					{(Material, props) => (
 						<Material metalness={0.5} roughness={0.9} {...props} />
 					)}
