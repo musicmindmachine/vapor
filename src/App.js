@@ -5,6 +5,8 @@ import {
   Dodecahedron,
   Tetrahedron,
   useMatcapTexture,
+  Sky,
+  Stars,
 } from "@react-three/drei";
 
 //other utilitie
@@ -109,18 +111,19 @@ const App = () => {
         camera={{ position: [-depth * 0.8, height * 0.9, 0], fov: 70 }}
       >
         <fog attach="fog" args={["black", 50, 70]} />
-        <ambientLight intensity={0.05} />
-        <pointLight
-          color={"#ccffff"}
+        <ambientLight intensity={0.01} />
+        <directionalLight position={[3, 0.4, 0]} args={["#ff5511", 0.4]} />
+        <directionalLight
+          color={"#66ffff"}
           position={[2.5, 8, 5]}
-          intensity={0.7}
-          shadow-mapSize-width={1024}
-          shadow-mapSize-height={1024}
-          shadow-camera-far={150}
-          shadow-camera-left={-10}
-          shadow-camera-right={10}
-          shadow-camera-top={10}
-          shadow-camera-bottom={-10}
+          intensity={0.3}
+        />
+        <Sky
+          mieCoefficient={0.2}
+          mieDirectionalG={4.0}
+          rayleigh={1.7}
+          turbidity={1.0}
+          sunPosition={[3.0, 0.003, 0.0]}
         />
         <Simulation position={{ x: 0.0, y: 3 + height * 0.5, z: 0.0 }} />
         <Floor position={[0.0, 0.0, 0.0]} wraps={64} />

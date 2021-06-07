@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect } from "react";
-import { Plane, Reflector } from "@react-three/drei";
+import { Plane } from "@react-three/drei";
 import { useTexture } from "@react-three/drei";
 import { RepeatWrapping } from "three";
 
@@ -23,13 +23,6 @@ const Floor = (props) => {
     concrete_ao.wrapT = RepeatWrapping;
     concrete_ao.repeat.set(wraps, wraps);
   }, [concrete_ao, wraps]);
-  /*
-  useEffect(() => {
-    concrete_bump.wrapS = RepeatWrapping;
-    concrete_bump.wrapT = RepeatWrapping;
-    concrete_bump.repeat.set(wraps, wraps);
-  }, [concrete_bump, wraps]);
-*/
   useEffect(() => {
     concrete_normal.wrapS = RepeatWrapping;
     concrete_normal.wrapT = RepeatWrapping;
@@ -48,25 +41,7 @@ const Floor = (props) => {
     concrete_rough.repeat.set(wraps, wraps);
   }, [concrete_rough, wraps]);
 
-  return props?.mirrored ? (
-    <Reflector
-      position={props?.position || [(0.0, 0.0, 0.0)]}
-      blur={[0, 0]}
-      mixBlur={0}
-      mixStrength={0.25}
-      resolution={1024}
-      args={[100, 100]}
-      rotation={[-Math.PI * 0.5, 0, 0]}
-      mirror={0.995}
-      minDepthThreshold={0.0}
-      maxDepthThreshold={0.01}
-      depthScale={0.2}
-    >
-      {(Material, mprops) => (
-        <Material metalness={0.5} roughness={0.9} {...mprops} />
-      )}
-    </Reflector>
-  ) : (
+  return (
     <Suspense
       fallback={
         <Plane
